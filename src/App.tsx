@@ -1,122 +1,93 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { SelectPrefecture } from "./components/SelectPrefecture/SelectPrefecture";
+import { TypingGame } from "./components/TypingGame/TypingGame";
+import { Collection } from "./components/Collection/Collection"; // ★追加
+import "./App.css";
+
+type Screen = "TOP" | "SELECT" | "PLAYING" | "COLLECTION";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [currentScreen, setCurrentScreen] = useState<Screen>("TOP");
+  const [selectedPrefecture, setSelectedPrefecture] = useState<string | null>(
+    null,
+  );
+
+  const handleSelect = (id: string) => {
+    setSelectedPrefecture(id);
+    setCurrentScreen("PLAYING");
+  };
+
+  const handleBackToTop = () => {
+    setSelectedPrefecture(null);
+    setCurrentScreen("TOP");
+  };
+
+  const handleBackToSelect = () => {
+    setSelectedPrefecture(null);
+    setCurrentScreen("SELECT");
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+    <div>
+      {/* トップ画面 */}
+      {currentScreen === "TOP" && (
+        <div
+          style={{
+            textAlign: "center",
+            marginTop: "100px",
+            fontFamily: "sans-serif",
+          }}
         >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+          <h1>47都道府県タイピング</h1>
+          <div
+            style={{
+              display: "flex",
+              gap: "20px",
+              justifyContent: "center",
+              marginTop: "40px",
+            }}
+          >
+            <button
+              onClick={() => setCurrentScreen("SELECT")}
+              style={{
+                padding: "15px 30px",
+                fontSize: "1.2rem",
+                cursor: "pointer",
+                backgroundColor: "#007bff",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+              }}
+            >
+              ゲームスタート
+            </button>
+          </div>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {/* 選択画面 */}
+      {currentScreen === "SELECT" && (
+        <SelectPrefecture
+          onSelect={handleSelect}
+          onBack={handleBackToTop}
+          onGoCollection={() => setCurrentScreen("COLLECTION")}
+        />
+      )}
+
+      {/* タイピング画面 */}
+      {currentScreen === "PLAYING" && selectedPrefecture && (
+        <TypingGame
+          prefectureId={selectedPrefecture}
+          onBack={handleBackToSelect}
+        />
+      )}
+
+      {/* コレクション画面 */}
+      {currentScreen === "COLLECTION" && (
+        <Collection onBack={handleBackToTop} />
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
